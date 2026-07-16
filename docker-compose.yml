@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  site1:
+    build:
+      context: ./site1
+    container_name: site1
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    networks:
+      - site1
+
+networks:
+  site1:
+    driver: bridge
