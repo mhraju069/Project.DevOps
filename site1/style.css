@@ -1,0 +1,675 @@
+﻿/* reset — hate browser defaults */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #111111;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+/* thin orange scrollbar, looks clean */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f15a24;
+  border-radius: 4px;
+}
+
+/* nav — fixed at top, icons only */
+.topnav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 35px;
+  padding: 18px 0;
+  height: 75px;
+  background-color: #111111;
+}
+
+.topnav a {
+  color: rgba(255, 255, 255, 0.5);
+  transition: color .25s;
+  display: flex;
+  align-items: center;
+  scale: 1.4;
+}
+
+.topnav a:hover,
+.topnav a.active {
+  color: #f15a24;
+}
+
+/* two columns — card on left, content scrolls on right */
+.layout {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  padding-top: 100px;
+  min-height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* sidebar sticks while you scroll */
+.sidebar {
+  width: 400px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 100px;
+  height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px 20px;
+}
+
+/* the white card with photo + info */
+.profile-card {
+  background: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+  width: 330px;
+  position: relative;
+  padding: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* dashed orange circle in the corner — decorative */
+.top-curve {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: 250px;
+  height: 250px;
+  pointer-events: none;
+  z-index: 99;
+}
+
+.photo-area {
+  width: 100%;
+  height: 340px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  z-index: 1;
+}
+
+/* orange gradient sits behind the photo */
+.photo-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: linear-gradient(135deg, #ff5e00 0%, #a30000 100%);
+}
+
+.photo-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* mix-blend-mode: multiply; — uncomment for duotone effect */
+  filter: grayscale(100%) contrast(1.2) brightness(0.9);
+}
+
+.profile-info {
+  padding: 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  width: 100%;
+}
+
+.profile-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #111;
+  text-align: center;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.profile-bio {
+  font-size: 1.1rem;
+  color: #666;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.social-links {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.soc-icon {
+  color: #f15a24;
+  display: flex;
+  transition: color .2s;
+}
+
+.soc-icon svg {
+  width: 25px;
+  height: 25px;
+  stroke-width: 2px;
+}
+
+.soc-icon:hover {
+  color: #ff4400;
+}
+
+/* not using this rn but keeping just in case */
+.video-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e02020;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 6px;
+  align-self: flex-start;
+  margin-left: 10px;
+  transition: opacity .2s;
+}
+
+.video-btn:hover {
+  opacity: .85;
+}
+
+/* right column — the scrollable part */
+.content {
+  flex: 1;
+  padding: 0 40px 0 20px;
+  max-width: 920px;
+}
+
+/* each section takes full viewport height */
+.sec {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0px 0 80px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sec:last-of-type {
+  border-bottom: none;
+}
+
+/* big stacked title — one white, one dark ghost below */
+.big-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.9;
+  margin-bottom: 48px;
+  letter-spacing: -0.03em;
+}
+
+.t-white {
+  font-size: clamp(4rem, 7.5vw, 6.5rem);
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.t-ghost {
+  font-size: clamp(4rem, 7.5vw, 6.5rem);
+  font-weight: 900;
+  color: #262626; /* barely visible, intentional */
+  text-transform: uppercase;
+}
+
+/* hero blurb under the title */
+.hero-desc {
+  font-size: 1.05rem;
+  color: #999;
+  max-width: 580px;
+  line-height: 1.65;
+  margin-bottom: 44px;
+}
+
+/* the three number stats */
+.stats-row {
+  display: flex;
+  gap: 64px;
+  margin-bottom: 48px;
+}
+
+.stat-n {
+  display: block;
+  font-size: 3.6rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+.stat-l {
+  display: block;
+  font-size: 0.72rem;
+  color: #666;
+  letter-spacing: 0.08em;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* orange + lime cards side by side */
+.skill-cards {
+  display: flex;
+  gap: 24px;
+}
+
+.skill-card {
+  flex: 1;
+  border-radius: 24px;
+  padding: 32px 32px 0;
+  min-height: 220px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.orange-card {
+  background: #f15a24;
+}
+
+.lime-card {
+  background: #b8ff00;
+}
+
+.sc-top {
+  margin-bottom: 14px;
+}
+
+.sc-text {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #fff;
+  text-transform: uppercase;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  flex: 1;
+}
+
+.lime-text {
+  color: #111; /* dark text on bright bg */
+}
+
+.sc-arrow {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lime-arrow {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* decorative wave/zigzag at the bottom of each card */
+.sc-deco {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+/* project / experience / tools rows */
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.list-item:first-child {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.list-item:hover .li-arrow {
+  color: #f15a24;
+}
+
+.list-item:hover h3 {
+  color: #f15a24;
+}
+
+/* small project preview box */
+.li-thumb {
+  width: 120px;
+  height: 90px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.thumb-1 {
+  background: linear-gradient(135deg, #1a0a2e, #6a1b9a);
+}
+
+.thumb-2 {
+  background: linear-gradient(135deg, #e8e0d0, #c8b89a);
+}
+
+.thumb-3 {
+  background: linear-gradient(135deg, #cc4400, #111);
+}
+
+.thumb-mockup {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* fake ui lines inside the thumb */
+.tm1::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 14px;
+  right: 14px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+.tm1::before {
+  content: '';
+  position: absolute;
+  top: 36px;
+  left: 14px;
+  width: 60%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.tm2::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 12px;
+  right: 12px;
+  bottom: 14px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.tm3::after {
+  content: 'SOFTWARE';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.58rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.li-body {
+  flex: 1;
+}
+
+.li-body h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+  transition: color .2s;
+}
+
+.li-body p {
+  font-size: 0.95rem;
+  color: #888;
+}
+
+.li-arrow {
+  font-size: 1.3rem;
+  color: #f15a24;
+  flex-shrink: 0;
+  transition: color .2s;
+  margin-left: 12px;
+}
+
+/* experience item — paragraph text a bit lighter */
+.exp-item .li-body p {
+  font-size: 0.95rem;
+  color: #999;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.exp-date {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* education / blog rows — same deal */
+.blog-item .li-body p {
+  font-size: 0.95rem;
+  color: #999;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.blog-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #666;
+}
+
+/* contact form */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 700px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.fg {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-size: 0.82rem;
+  color: #888;
+  font-weight: 500;
+}
+
+input,
+select,
+textarea {
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color .2s;
+  resize: none;
+  -webkit-appearance: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #555;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #f15a24;
+}
+
+select option {
+  background: #2a2a2a;
+}
+
+.submit-btn {
+  background: #f15a24;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity .2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.submit-btn:hover {
+  opacity: .85;
+}
+
+/* shows up after form submit */
+.success-msg {
+  display: none;
+  text-align: center;
+  color: #4ade80;
+  font-size: 0.88rem;
+  padding: 12px;
+  background: rgba(74, 222, 128, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.footer {
+  text-align: center;
+  padding: 48px 0 32px;
+  color: #444;
+  font-size: 0.88rem;
+}
+
+.footer a {
+  color: #f15a24;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* tablet — tighten up a bit */
+@media (max-width: 1024px) {
+  .layout {
+    gap: 40px;
+  }
+
+  .sidebar {
+    width: 360px;
+  }
+
+  .profile-card {
+    width: 300px;
+    padding: 20px;
+  }
+
+  .photo-area {
+    height: 300px;
+  }
+}
+
+/* mobile — stack everything */
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px;
+    gap: 40px;
+  }
+
+  .sidebar {
+    position: relative;
+    top: 0;
+    height: auto;
+    width: 100%;
+    padding: 24px 20px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-card {
+    width: 330px;
+  }
+
+  .content {
+    padding: 20px 24px 40px;
+    max-width: 100%;
+  }
+}
+
+/* small phones — single column form, stacked cards */
+@media (max-width: 680px) {
+  .skill-cards {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
