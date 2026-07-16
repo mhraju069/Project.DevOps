@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   site1:
     build:
@@ -10,7 +8,21 @@ services:
       - "8000:8000"
     networks:
       - site1
+  
+  site2:
+    build:
+      context: ./site2
+    container_name: site2
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    networks:
+      - site2
+
+
 
 networks:
   site1:
+    driver: bridge
+  site2:
     driver: bridge
