@@ -1,0 +1,62 @@
+name : Deployment of devops tasks to EC2
+
+on :
+    push :
+        branches:
+        - main
+
+jobs :
+    deploy :
+        runs-on : ubuntu-latest
+
+        environment :
+            name : prod
+
+        steps :
+
+            - name : Deploy to EC2
+              uses : appleboy/ssh-action@v1.0.3
+
+              with :
+                host : ${{ secrets.EC2_HOST }}
+                username : ${{ secrets.EC2_USERNAME }}
+                key : ${{ secrets.EC2_KEY }}
+                port : ${{ secrets.EC2_PORT }}
+
+                script : |
+
+                    PROJECT_PATH="${{ secrets.EC2_PROJECT_PATH }}"
+
+                    if [ ! -d "$PROJECT_PATH/.git" ]; then
+
+                    echo "Project not found"
+
+                    sudo apt-get update -y
+
+                    sudo apt-get install -y docker.io
+
+                    sudo usermod -aG docker $USER && newgrp docker
+
+                    sudo apt-get install -y docker-compose-v2
+
+                    mkdir -p "$PROJECT_PATH"
+
+                    echo "Cloning project..."
+
+                    git clone ${{ secrets.EC2_REPO_URL }} "$PROJECT_PATH"
+
+                    fi
+
+                    cd "$PROJECT_PATH"
+
+                    echo "Deploying the project..."
+
+                    git restore .
+
+                    git fetch origin main
+
+                    git reset --hard origin/main
+
+                    sudo docker compose down && sudo docker compose up --build -d
+
+                    echo "Deployed successfully"
