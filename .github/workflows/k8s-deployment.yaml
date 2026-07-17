@@ -47,11 +47,12 @@ jobs:
               sudo apt-get install -y docker.io
               sudo systemctl start docker
               sudo systemctl enable docker
-              sudo usermod -aG docker $USER &&  newgrp docker
+              sudo usermod -aG docker $USER
               echo "Docker installed. Group membership applies on next SSH session; using sudo for this run."
             fi
 
             sudo docker --version
+            sudo docker ps
             echo "Docker validation completed."
 
 
