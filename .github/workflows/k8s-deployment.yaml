@@ -1,0 +1,160 @@
+name: Deployment of devops tasks with k8s and Helm
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: prod
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+
+          script: |
+
+            PROJECT_PATH="${{ secrets.EC2_PROJECT_PATH }}"
+
+            if [ ! -d "$PROJECT_PATH/.git" ]; then
+              echo "Project not found, cloning..."
+              mkdir -p "$PROJECT_PATH"
+              git clone ${{ secrets.EC2_REPO_URL }} "$PROJECT_PATH"
+            fi
+
+            cd "$PROJECT_PATH"
+
+            echo "Updating project files..."
+            git restore .
+            git fetch origin
+            git reset --hard origin/${{ github.ref_name }}
+
+
+
+            if ! command -v docker &> /dev/null; then
+              echo "Installing Docker..."
+              sudo apt-get update -y
+              sudo apt-get install -y docker.io
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker $USER
+              echo "Docker installed. Group membership applies on next SSH session; using sudo for this run."
+            fi
+
+            sudo docker --version
+            echo "Docker validation completed."
+
+
+
+            if ! command -v kind &> /dev/null; then
+              echo "Installing Kind..."
+              [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.24.0/kind-linux-amd64
+              chmod +x ./kind
+              sudo mv ./kind /usr/local/bin/kind
+            fi
+
+            kind --version
+            echo "Kind validation completed."
+
+
+
+            if ! command -v kubectl &> /dev/null; then
+              echo "Installing kubectl..."
+              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+              chmod +x kubectl
+              sudo mv kubectl /usr/local/bin/
+            fi
+
+            kubectl version --client
+            echo "kubectl validation completed."
+
+
+
+            if ! command -v helm &> /dev/null; then
+              echo "Installing Helm..."
+              curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+              chmod 700 get_helm.sh
+              ./get_helm.sh && rm get_helm.sh
+            fi
+
+            helm version
+            echo "Helm validation completed."
+
+
+
+            sudo systemctl start docker
+
+
+
+            if ! sudo kind get clusters | grep -q "^kind$"; then
+              echo "Creating Kind cluster..."
+              sudo kind create cluster --config k8s/config.yaml
+            else
+              echo "Kind cluster already exists."
+            fi
+
+            sudo kind get clusters
+            echo "Kind cluster validation completed."
+
+
+
+
+            echo "Adding and updating ingress-nginx Helm repository..."
+            sudo helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx || true
+            sudo helm repo update
+            echo "Helm repository added and updated."
+
+
+
+            echo "Deploying Nginx Ingress Controller..."
+            sudo helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+              --namespace ingress-nginx --create-namespace \
+              -f k8s/ingress-values.yaml
+
+
+
+            echo "Waiting for Ingress Nginx Controller to be ready..."
+            sudo kubectl wait --namespace ingress-nginx \
+              --for=condition=ready pod \
+              --selector=app.kubernetes.io/component=controller \
+              --timeout=120s
+
+
+
+            echo "Building site1 and site2 Docker images..."
+            sudo docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/site1:latest ./site1
+            sudo docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/site2:latest ./site2
+
+
+
+            echo "Loading images into Kind cluster..."
+            sudo kind load docker-image ${{ secrets.DOCKERHUB_USERNAME }}/site1:latest
+            sudo kind load docker-image ${{ secrets.DOCKERHUB_USERNAME }}/site2:latest
+
+
+
+            echo "Deploying site1 Helm chart..."
+            sudo helm upgrade --install site1 ./k8s/site1 \
+              --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/site1 \
+              --set image.tag=latest \
+              --set image.pullPolicy=IfNotPresent
+
+
+
+            echo "Deploying site2 Helm chart..."
+            sudo helm upgrade --install site2 ./k8s/site2 \
+              --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/site2 \
+              --set image.tag=latest \
+              --set image.pullPolicy=IfNotPresent
+
+            echo "Deployment completed successfully!"
