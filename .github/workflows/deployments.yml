@@ -31,11 +31,13 @@ jobs :
 
                     echo "Project not found"
 
-                    sudo apt-get install docker.io
+                    sudo apt-get update -y
+
+                    sudo apt-get install -y docker.io
 
                     sudo usermod -aG docker $USER && newgrp docker
 
-                    sudo apt-get install docker-compose-v2
+                    sudo apt-get install -y docker-compose-v2
 
                     mkdir -p "$PROJECT_PATH"
 
